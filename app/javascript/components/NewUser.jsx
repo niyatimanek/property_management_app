@@ -50,7 +50,7 @@ class NewUser extends React.Component {
 			if (response.ok){
 				return response.json();
 			}
-			//throw new Error("Network response was not ok");
+			throw new Error("Network response was not ok");
 		})
 		.then(response => this.props.history.push(`/user/${response.id}`))
       	.catch(error => console.log(error.message));

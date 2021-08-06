@@ -6,8 +6,7 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     user = User.new(user_params)
-    binding.pry
-    if true
+    if user.save
       render json: user
     else
       render json: { message: "Validation failed", errors: user.errors }, status: 400
