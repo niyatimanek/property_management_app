@@ -9,7 +9,8 @@ class NewUser extends React.Component {
 			last_name: "",
 			username: "",
 			password: "",
-			role: "user"
+			role: "user",
+			errorMessage: []
 		};
 
 		this.onChange = this.onChange.bind(this);
@@ -37,7 +38,6 @@ class NewUser extends React.Component {
 		}
 
 		const token = document.querySelector('meta[name="csrf-token"]').content;
-		debugger
 		fetch(url, {
 			method: "Post",
 			headers: {
@@ -46,77 +46,92 @@ class NewUser extends React.Component {
 			},
 			body: JSON.stringify(body)
 		})
-		.then(response => {
-			if (response.ok){
-				return response.json();
-			}
-			throw new Error("Network response was not ok");
+		.then(async response => {
+			const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson && await response.json();
+
+            // check for error response
+            if (!response.ok) {
+            	const error = data || response.status;
+                return Promise.reject(error);
+            }
+
 		})
-		.then(response => this.props.history.push(`/user/${response.id}`))
-      	.catch(error => console.log(error.message));
+		.then(response => this.props.history.push(`/users`))
+      	.catch(error => {
+      		this.setState({ errorMessage: Object.entries(error.errors).map(([key,value],i) => `${key} ${value}` ) });
+      		console.log('There was an error!', error)
+      	});
 	}
 
 	render(){
 		return(
 			<div className="container mt-5">
 				<div className="row">
-				  <div className="col-sm-12 col-lg-6 offset-lg-3">
-				    <h1 className="font-weight-normal mb-5">
-				      Add a new user
-				    </h1>
-				    <form onSubmit={this.onSubmit}>
-				      <div className="form-group">
-				        <label htmlFor="firstName">First Name *</label>
-				        <input
-				          type="text"
-				          name="first_name"
-				          id="firstName"
-				          className="form-control"
-				          required
-				          onChange={this.onChange}
-				        />
-				      </div>
-				      <div className="form-group">
-				        <label htmlFor="lastName">Last Name *</label>
-				        <input
-				          type="text"
-				          name="last_name"
-				          id="lastName"
-				          className="form-control"
-				          required
-				          onChange={this.onChange}
-				        />
-				      </div>
-				      <div className="form-group">
-				        <label htmlFor="userName">User Name *</label>
-				        <input
-				          type="text"
-				          name="username"
-				          id="userName"
-				          className="form-control"
-				          required
-				          onChange={this.onChange}
-				        />
-				      </div>
-				      <div className="form-group">
-				        <label htmlFor="password">Password *</label>
-				        <input
-				          type="password"
-				          name="password"
-				          id="password"
-				          className="form-control"
-				          required
-				          onChange={this.onChange}
-				        />
-				      </div>
-				      <button type="submit" className="btn custom-button mt-3">
-				        Create User
-				      </button>
-				      <Link to="/users" className="btn btn-link mt-3">
-				        Back to users
-				      </Link>
-				    </form>
-				  </div>
+					{ this.state.errorMessage.length > 0 &&
+						<div className="alert alert-danger" role="alert">
+							<ul className="list-unstyled">
+								{this.state.errorMessage.map( (e,i) => <li key={i}>{e}</li>)}
+							</ul>
+						</div>
+					}
+				  	<div className="col-sm-12 col-lg-6 offset-lg-3">
+					    <h1 className="font-weight-normal mb-5">
+					      Add a new user
+					    </h1>
+					    <form onSubmit={this.onSubmit}>
+					      <div className="form-group">
+					        <label htmlFor="firstName">First Name *</label>
+					        <input
+					          type="text"
+					          name="first_name"
+					          id="firstName"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					        />
+					      </div>
+					      <div className="form-group">
+					        <label htmlFor="lastName">Last Name *</label>
+					        <input
+					          type="text"
+					          name="last_name"
+					          id="lastName"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					        />
+					      </div>
+					      <div className="form-group">
+					        <label htmlFor="userName">User Name *</label>
+					        <input
+					          type="text"
+					          name="username"
+					          id="userName"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					        />
+					      </div>
+					      <div className="form-group">
+					        <label htmlFor="password">Password *</label>
+					        <input
+					          type="password"
+					          name="password"
+					          id="password"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					        />
+					      </div>
+					      <button type="submit" className="btn custom-button mt-3">
+					        Create User
+					      </button>
+					      <Link to="/users" className="btn btn-link mt-3">
+					        Back to users
+					      </Link>
+					    </form>
+				  	</div>
 				</div>
 			</div>
 		);

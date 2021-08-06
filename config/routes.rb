@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       post 'users/create'
       get 'users/show/:id', to: 'users#show'
       delete 'users/destroy/:id', to: 'users#destroy'
+      put 'users/deactivate/:id', to: 'users#deactivate'
     end
   end
   root 'homepage#index'

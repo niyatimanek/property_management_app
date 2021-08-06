@@ -19,9 +19,18 @@ class Api::V1::UsersController < ApplicationController
   def destroy
   end
 
+  def deactivate
+    user.update_columns(is_active: false)
+    render json: {message: 'User Deactivated'}
+  end
+
   private
 
   def user_params
     params.permit(:first_name, :last_name, :username, :password, :role)
   end
+
+  def user
+    @user ||= User.find(params[:id]) 
+  end 
 end

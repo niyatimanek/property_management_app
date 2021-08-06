@@ -23,6 +23,28 @@ class Users extends React.Component {
 			.catch(() => this.props.history.push("/"))
 	}
 
+	deactivateUser = (id) => {
+		console.log(id)
+		const url = '/api/v1/users/deactivate/'+id;
+		const token = document.querySelector('meta[name="csrf-token"]').content;
+
+		fetch(url, {
+			method: "PUT",
+			headers: {
+				"X-CSRF-Token": token,
+				"Content-Type": "application/json"
+			}
+		})
+		.then(response => {
+	        if (response.ok) {
+	          return response.json();
+	        }
+	        throw new Error("Network response was not ok.");
+	    })
+	    .then(window.location.reload(false))
+	    .catch(error => console.log(error.message));
+	}
+
 	render() {
 		const columns = [
 						  {
@@ -42,7 +64,7 @@ class Users extends React.Component {
 						  },
 						  {
 						    name: 'Action',
-						    selector: '',
+						    selector: row => <div><button className="btn btn-success">Update</button> <button className="btn btn-danger" onClick={ () => this.deactivateUser(`${ row.id }`) }>De-Activate</button></div>,
 						    sortable: true,
 						  },
 						];
