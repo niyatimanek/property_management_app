@@ -1,17 +1,31 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import DataTable from 'react-data-table-component';
 
-class Users extends React.Component {
-	constructor(props){
+class User extends React.Component {
+	constructor(props) {
 		super(props);
-		this.state = {
-			users: []
-		};
+		this.state = { user: {
+			id: this.props.id,
+			first_name: '',
+			last_name: '',
+			username: '',
+			password: '',
+			role: '', 
+		},errorMessage: []};
+
+		this.onChange = this.onChange.bind(this);
+		this.onSubmit = this.onSubmit.bind(this);
 	}
 
-	componentDidMount(){
-		const url = "/api/v1/users/index";
+	componentDidMount() {	
+		const {
+			match: {
+				params: { id }
+			}
+		} = this.props;
+
+		const url = `/api/v1/users/show/${id}`;
+
 		fetch(url)
 			.then(response => {
 				if (response.ok) {
@@ -19,99 +33,136 @@ class Users extends React.Component {
 				}
 				throw new Error("Network response was not ok")
 			})
-			.then(response => this.setState({ users: response} ))
-			.catch(() => this.props.history.push("/"))
+			.then(response => this.setState({ user: response} ))
+			.catch(() => this.props.history.push("/users"))
 	}
 
-	deactivateUser = (id) => {
-		console.log(id)
-		const url = '/api/v1/users/deactivate/'+id;
-		const token = document.querySelector('meta[name="csrf-token"]').content;
+	onChange(event) {
+		//this.setState({ user[event.target.name]: event.target.value });
+		var user = {...this.state.user}
+		user[event.target.name] = event.target.value;
+		this.setState({user});
+	}
 
+	onSubmit() {
+		event.preventDefault();
+		const url = "/api/v1/users/update/"+this.state.user.id;
+		const { first_name, last_name, username, role } = this.state.user;
+
+		if( first_name.length == 0 || last_name.length == 0)
+			return;
+
+		const body = {
+			first_name,
+			last_name,
+			username,
+			role
+		}
+		const token = document.querySelector('meta[name="csrf-token"]').content;
 		fetch(url, {
-			method: "PUT",
+			method: "Put",
 			headers: {
 				"X-CSRF-Token": token,
-				"Content-Type": "application/json"
-			}
+        		"Content-Type": "application/json"
+			},
+			body: JSON.stringify(body)
 		})
-		.then(response => {
-	        if (response.ok) {
-	          return response.json();
-	        }
-	        throw new Error("Network response was not ok.");
-	    })
-	    .then(window.location.reload(false))
-	    .catch(error => console.log(error.message));
+		.then(async response => {
+			const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson && await response.json();
+
+            // check for error response
+            if (!response.ok) {
+            	const error = data || response.status;
+                return Promise.reject(error);
+            }
+
+		})
+		.then(response => this.props.history.push(`/users`))
+      	.catch(error => {
+      		this.setState({ errorMessage: Object.entries(error.errors).map(([key,value],i) => `${key} ${value}` ) });
+      		console.log('There was an error!', error)
+      	});
 	}
 
-	render() {
-		const columns = [
-						  {
-						    name: 'Name',
-						    selector: row => `${ row.first_name } ${ row.last_name }`,
-						    sortable: true,
-						  },
-						  {
-						    name: 'Username',
-						    selector: row => `${ row.username }`,
-						    sortable: true,
-						  },
-						  {
-						    name: 'Role',
-						    selector: row => `${ row.role }`,
-						    sortable: true,
-						  },
-						  {
-						    name: 'Action',
-						    selector: row => <div><button className="btn btn-success">Update</button> <button className="btn btn-danger" onClick={ () => this.deactivateUser(`${ row.id }`) }>De-Activate</button></div>,
-						    sortable: true,
-						  },
-						];
-	    const { users } = this.state;
-	  	const allUsers = <DataTable
-					        title="All Users"
-					        columns={columns}
-					        data={users}
-					      />
+	render(){
+		const { user } = this.state;
 
-	    const noUser = (
-	      <div className="vw-100 vh-50 d-flex align-items-center justify-content-center">
-	        <h4>
-	          No users yet. Why not <Link to="/new_recipe">create one</Link>
-	        </h4>
-	      </div>
-	    );
-
-	    return (
-			<>
-				<section className="jumbotron jumbotron-fluid text-center">
-					<div className="container py-5">
-						<h1 className="display-4">Users</h1>
-						<p className="lead text-muted">
-						  All the Users are listed below
-						</p>
-					</div>
-				</section>
-				<div className="py-5">
-					<main className="container">
-						<div className="text-right mb-3">
-							<Link to="/newUser" className="btn custom-button">
-								Create New User
-							</Link>
-							&nbsp;&nbsp;&nbsp;
-							<Link to="/superAdminDashboard" className="btn custom-button">
-							 	Go to Super Admin Dashboard
-							</Link>
+		return(
+			<div className="container mt-5">
+				<div className="row">
+					{ this.state.errorMessage.length > 0 &&
+						<div className="alert alert-danger" role="alert">
+							<ul className="list-unstyled">
+								{this.state.errorMessage.map( (e,i) => <li key={i}>{e}</li>)}
+							</ul>
 						</div>
-						<div className="row">
-						  { users.length > 0 ? allUsers : noUser }
-						</div>
-					</main>
+					}
+				  	<div className="col-sm-12 col-lg-6 offset-lg-3">
+					    <h1 className="font-weight-normal mb-5">
+					      Edit user
+					    </h1>
+					    <form onSubmit={this.onSubmit}>
+					      <div className="form-group">
+					        <label htmlFor="firstName">First Name *</label>
+					        <input
+					          type="text"
+					          name="first_name"
+					          id="firstName"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					          defaultValue={user.first_name}
+					        />
+					      </div>
+					      <div className="form-group">
+					        <label htmlFor="lastName">Last Name *</label>
+					        <input
+					          type="text"
+					          name="last_name"
+					          id="lastName"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					          defaultValue={user.last_name}
+					        />
+					      </div>
+					      <div className="form-group">
+					        <label htmlFor="userName">User Name *</label>
+					        <input
+					          type="text"
+					          name="username"
+					          id="userName"
+					          className="form-control"
+					          required
+					          onChange={this.onChange}
+					          defaultValue={user.username}
+					        />
+					      </div>
+					      <div className="form-group">
+					        <label htmlFor="role">Role *</label>
+					        <input
+					          type="text"
+					          name="role"
+					          id="role"
+					          className="form-control"
+					          required
+					          disabled
+					          value={user.role}
+					        />
+					      </div>
+					      <button type="submit" className="btn custom-button mt-3">
+					        Update User
+					      </button>
+					      <Link to="/users" className="btn btn-link mt-3">
+					        Back to users
+					      </Link>
+					    </form>
+				  	</div>
 				</div>
-			</>
-	    );
-	  }
+			</div>
+		);
+	}
 }
 
-export default Users;
+export default User;

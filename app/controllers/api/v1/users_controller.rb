@@ -14,6 +14,19 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
+    if user
+      render json: user
+    else
+      render json: user.errors
+    end
+  end
+
+  def update
+    if user.update(user_params)
+      render json: user
+    else
+      render json: { message: "Validation failed", errors: user.errors }, status: 400
+    end
   end
 
   def destroy

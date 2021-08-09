@@ -4,7 +4,8 @@ Rails.application.routes.draw do
       get 'users/index'
       post 'users/create'
       get 'users/show/:id', to: 'users#show'
-      delete 'users/destroy/:id', to: 'users#destroy'
+      get 'users/show/:id', to: 'users#show'
+      put 'users/update/:id', to: 'users#update'
       put 'users/deactivate/:id', to: 'users#deactivate'
     end
   end
