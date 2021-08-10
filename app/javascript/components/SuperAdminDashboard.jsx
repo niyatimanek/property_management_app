@@ -30,7 +30,7 @@ class SuperAdminDashboards extends React.Component {
 				    </Link>
 				    &nbsp;&nbsp;&nbsp;
 				    <Link
-				      to="/"
+				      to="/properties"
 				      className="btn btn-lg custom-button"
 				      role="button"
 				    >

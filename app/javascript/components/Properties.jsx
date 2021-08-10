@@ -2,17 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 
-class Users extends React.Component {
-	constructor(props){
+class Properties extends React.Component {
+	constructor(props) {
 		super(props);
 		this.state = {
-			users: [],
-			role: "user"
-		};
+			properties: []
+		}
 	}
 
 	componentDidMount(){
-		const url = `/api/v1/users/index?role=${this.state.role}`;
+		const url = "/api/v1/properties/index";
+
 		fetch(url)
 			.then(response => {
 				if (response.ok) {
@@ -20,47 +20,25 @@ class Users extends React.Component {
 				}
 				throw new Error("Network response was not ok")
 			})
-			.then(response => this.setState({ users: response} ))
+			.then(response => this.setState({ properties: response} ))
 			.catch(() => this.props.history.push("/"))
 	}
 
-	deactivateUser = (id) => {
-		console.log(id);
-		const url = '/api/v1/users/deactivate/'+id;
-		const token = document.querySelector('meta[name="csrf-token"]').content;
-
-		fetch(url, {
-			method: "PUT",
-			headers: {
-				"X-CSRF-Token": token,
-				"Content-Type": "application/json"
-			}
-		})
-		.then(response => {
-	        if (response.ok) {
-	          return response.json();
-	        }
-	        throw new Error("Network response was not ok.");
-	    })
-	    .then(window.location.reload(false))
-	    .catch(error => console.log(error.message));
-	}
-
-	render() {
+	render(){
 		const columns = [
 						  {
-						    name: 'Name',
-						    selector: row => `${ row.first_name } ${ row.last_name }`,
+						    name: 'Property Name',
+						    selector: row => `${ row.name }`,
 						    sortable: true,
 						  },
 						  {
-						    name: 'Username',
-						    selector: row => `${ row.username }`,
+						    name: 'Location',
+						    selector: row => `${ row.address }`,
 						    sortable: true,
 						  },
 						  {
-						    name: 'Role',
-						    selector: row => `${ row.role }`,
+						    name: 'Owner',
+						    selector: row => `${ row.admin_id }`,
 						    sortable: true,
 						  },
 						  {
@@ -69,18 +47,17 @@ class Users extends React.Component {
 						    sortable: true,
 						  },
 						];
-	    const { users } = this.state;
-	    const role = this.state.role;
-	  	const allUsers = <DataTable
+	    const { properties } = this.state;
+	  	const allProperties = <DataTable
 					        title="All Users"
 					        columns={columns}
-					        data={users}
+					        data={properties}
 					      />
 
-	    const noUser = (
+	    const noProperty = (
 	      <div className="vw-100 vh-50 d-flex align-items-center justify-content-center">
 	        <h4>
-	          No users yet. Why not <Link to="/newUser">create one</Link>
+	          No properties yet. Why not <Link to="/newProperty">create one</Link>
 	        </h4>
 	      </div>
 	    );
@@ -89,17 +66,17 @@ class Users extends React.Component {
 			<>
 				<section className="jumbotron jumbotron-fluid text-center">
 					<div className="container py-5">
-						<h1 className="display-4">Users</h1>
+						<h1 className="display-4">Properties</h1>
 						<p className="lead text-muted">
-						  All the Users are listed below
+						  All the Properties are listed below
 						</p>
 					</div>
 				</section>
 				<div className="py-5">
 					<main className="container">
 						<div className="text-right mb-3">
-							<Link to={`/newUser/${role}`} className="btn custom-button">
-								Create New User
+							<Link to={"/newProperty"} className="btn custom-button">
+								Create New Property
 							</Link>
 							&nbsp;&nbsp;&nbsp;
 							<Link to="/superAdminDashboard" className="btn custom-button">
@@ -107,13 +84,13 @@ class Users extends React.Component {
 							</Link>
 						</div>
 						<div className="row">
-						  { users.length > 0 ? allUsers : noUser }
+						  { properties.length > 0 ? allProperties : noProperty }
 						</div>
 					</main>
 				</div>
 			</>
 	    );
-	  }
+	}
 }
 
-export default Users;
+export default Properties;

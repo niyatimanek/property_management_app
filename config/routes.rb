@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      get 'properties/index'
+      post 'properties/create'
+      get 'properties/show'
+      get 'properties/destroy'
+    end
+  end
+  namespace :api do
+    namespace :v1 do
       get 'users/index'
       post 'users/create'
       get 'users/show/:id', to: 'users#show'

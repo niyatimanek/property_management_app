@@ -4,4 +4,6 @@ class User < ApplicationRecord
 	validates :username, presence: true, uniqueness: { case_sensitive: true }
 	validates :password, presence: true
 	default_scope { where(:is_active => true) }
+
+	has_many :properties
 end
