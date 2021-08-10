@@ -1,6 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   def index
-    users = User.all.order(created_at: :desc)
+    #users = User.all.order(created_at: :desc)
+    users = User.where(role: params[:role]).order(created_at: :desc)
     render json: users
   end
 

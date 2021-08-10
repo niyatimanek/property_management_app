@@ -78,7 +78,7 @@ class User extends React.Component {
             }
 
 		})
-		.then(response => this.props.history.push(`/users`))
+		.then(response => this.props.history.push(`/${role}s`))
       	.catch(error => {
       		this.setState({ errorMessage: Object.entries(error.errors).map(([key,value],i) => `${key} ${value}` ) });
       		console.log('There was an error!', error)
@@ -100,7 +100,7 @@ class User extends React.Component {
 					}
 				  	<div className="col-sm-12 col-lg-6 offset-lg-3">
 					    <h1 className="font-weight-normal mb-5">
-					      Edit user
+					      {`Edit ${user.role}`} 
 					    </h1>
 					    <form onSubmit={this.onSubmit}>
 					      <div className="form-group">
@@ -152,10 +152,10 @@ class User extends React.Component {
 					        />
 					      </div>
 					      <button type="submit" className="btn custom-button mt-3">
-					        Update User
+					        {`Update ${user.role}`}
 					      </button>
-					      <Link to="/users" className="btn btn-link mt-3">
-					        Back to users
+					      <Link to={`/${user.role}s`} className="btn btn-link mt-3">
+					        {`Back to ${user.role}s`}
 					      </Link>
 					    </form>
 				  	</div>

@@ -2,12 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 
-class Users extends React.Component {
+class Admins extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			users: [],
-			role: "user"
+			admins: [],
+			role: "admin"
 		};
 	}
 
@@ -20,7 +20,7 @@ class Users extends React.Component {
 				}
 				throw new Error("Network response was not ok")
 			})
-			.then(response => this.setState({ users: response} ))
+			.then(response => this.setState({ admins: response} ))
 			.catch(() => this.props.history.push("/"))
 	}
 
@@ -73,18 +73,18 @@ class Users extends React.Component {
 						    sortable: true,
 						  },
 						];
-	    const { users } = this.state;
+	    const { admins } = this.state;
 	    const role = this.state.role;
-	  	const allUsers = <DataTable
-					        title="All Users"
+	  	const allAdmins = <DataTable
+					        title="All Admins"
 					        columns={columns}
-					        data={users}
+					        data={admins}
 					      />
 
-	    const noUser = (
+	    const noAdmins = (
 	      <div className="vw-100 vh-50 d-flex align-items-center justify-content-center">
 	        <h4>
-	          No users yet. Why not <Link to="/newUser">create one</Link>
+	          No admins yet. Why not <Link to="/newUser">create one</Link>
 	        </h4>
 	      </div>
 	    );
@@ -93,9 +93,9 @@ class Users extends React.Component {
 			<>
 				<section className="jumbotron jumbotron-fluid text-center">
 					<div className="container py-5">
-						<h1 className="display-4">Users</h1>
+						<h1 className="display-4">admins</h1>
 						<p className="lead text-muted">
-						  All the Users are listed below
+						  All the admins are listed below
 						</p>
 					</div>
 				</section>
@@ -103,7 +103,7 @@ class Users extends React.Component {
 					<main className="container">
 						<div className="text-right mb-3">
 							<Link to={`/newUser/${role}`} className="btn custom-button">
-								Create New User
+								Create New Admin
 							</Link>
 							&nbsp;&nbsp;&nbsp;
 							<Link to="/superAdminDashboard" className="btn custom-button">
@@ -111,7 +111,7 @@ class Users extends React.Component {
 							</Link>
 						</div>
 						<div className="row">
-						  { users.length > 0 ? allUsers : noUser }
+						  { admins.length > 0 ? allAdmins : noAdmins }
 						</div>
 					</main>
 				</div>
@@ -120,4 +120,4 @@ class Users extends React.Component {
 	  }
 }
 
-export default Users;
+export default Admins;

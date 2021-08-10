@@ -9,7 +9,7 @@ class NewUser extends React.Component {
 			last_name: "",
 			username: "",
 			password: "",
-			role: "user",
+			role: this.props.match.params.role,
 			errorMessage: []
 		};
 
@@ -57,7 +57,7 @@ class NewUser extends React.Component {
             }
 
 		})
-		.then(response => this.props.history.push(`/users`))
+		.then(response => this.props.history.push(`/${role}s`))
       	.catch(error => {
       		this.setState({ errorMessage: Object.entries(error.errors).map(([key,value],i) => `${key} ${value}` ) });
       		console.log('There was an error!', error)
@@ -65,6 +65,7 @@ class NewUser extends React.Component {
 	}
 
 	render(){
+		const role = this.state.role;
 		return(
 			<div className="container mt-5">
 				<div className="row">
@@ -77,7 +78,7 @@ class NewUser extends React.Component {
 					}
 				  	<div className="col-sm-12 col-lg-6 offset-lg-3">
 					    <h1 className="font-weight-normal mb-5">
-					      Add a new user
+					      {`Add a new ${role}`}
 					    </h1>
 					    <form onSubmit={this.onSubmit}>
 					      <div className="form-group">
@@ -125,10 +126,10 @@ class NewUser extends React.Component {
 					        />
 					      </div>
 					      <button type="submit" className="btn custom-button mt-3">
-					        Create User
+					        {`Create ${role}`}
 					      </button>
-					      <Link to="/users" className="btn btn-link mt-3">
-					        Back to users
+					      <Link to={`/${role}`} className="btn btn-link mt-3">
+					        {`Back to ${role}`}
 					      </Link>
 					    </form>
 				  	</div>

@@ -5,6 +5,7 @@ import Users from "../components/Users";
 import SuperAdminDashboard from "../components/SuperAdminDashboard";
 import NewUser from "../components/NewUser";
 import User from "../components/User";
+import Admins from "../components/Admins";
 
 export default (
   <Router>
@@ -12,8 +13,9 @@ export default (
       <Route path="/" exact component={Home} />
       <Route path="/users" exact component={Users} />
       <Route path="/superAdminDashboard" exact component={SuperAdminDashboard} />
-      <Route path="/newUser" exact component={NewUser} />
+      <Route path="/newUser/:role" exact component={NewUser} />
       <Route path="/user/:id" exact component={User} />
+      <Route path="/admins" exact component={Admins} />
     </Switch>
   </Router>
 );
