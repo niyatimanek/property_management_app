@@ -24,6 +24,27 @@ class Properties extends React.Component {
 			.catch(() => this.props.history.push("/"))
 	}
 
+	deactivateProperty = (id) => {
+		const url = '/api/v1/properties/deactivate/'+id;
+		const token = document.querySelector('meta[name="csrf-token"]').content;
+
+		fetch(url, {
+			method: "PUT",
+			headers: {
+				"X-CSRF-Token": token,
+				"Content-Type": "application/json"
+			}
+		})
+		.then(response => {
+	        if (response.ok) {
+	          return response.json();
+	        }
+	        throw new Error("Network response was not ok.");
+	    })
+	    .then(window.location.reload(false))
+	    .catch(error => console.log(error.message));
+	}
+
 	render(){
 		const columns = [
 						  {
@@ -33,17 +54,23 @@ class Properties extends React.Component {
 						  },
 						  {
 						    name: 'Location',
-						    selector: row => `${ row.address }`,
+						    selector: row => `${ row.address }, ${ row.city } - ${ row.zipcode }, ${row.state} ${row.country}`,
 						    sortable: true,
+						    wrap: true
 						  },
 						  {
 						    name: 'Owner',
-						    selector: row => `${ row.admin_id }`,
+						    selector: row => `${ row.user.first_name } ${ row.user.last_name }`,
+						    sortable: true,
+						  },
+						  {
+						    name: 'Approval Status',
+						    selector: row => `${ row.is_approved ? 'Approved' : 'Rejected' }`,
 						    sortable: true,
 						  },
 						  {
 						    name: 'Action',
-						    selector: row => <div><Link to={{ pathname:'/user/'+`${ row.id }`}} className="btn btn-success">Update</Link> <button className="btn btn-danger" onClick={ () => this.deactivateUser(`${ row.id }`) }>De-Activate</button></div>,
+						    selector: row => <div><Link to={{ pathname:'/property/'+`${ row.id }`}} className="btn btn-success">Update</Link> <button className="btn btn-danger" onClick={ () => this.deactivateProperty(`${ row.id }`) }>De-Activate</button></div>,
 						    sortable: true,
 						  },
 						];

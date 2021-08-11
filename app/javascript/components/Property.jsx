@@ -2,60 +2,74 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
 
-class NewUser extends React.Component {
+class Property extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			name: "",
-			address: "",
-			city: "",
-			state: "",
-			zipcode: "",
-			country: "",
-			is_approved: true,
-			admin_id: "",
-			owners: [],
-			errorMessage: []
+		this.state = { property: {
+				id: this.props.id,
+				name: '',
+				address: '',
+				city: '',
+				zipcode: '',
+				country: '', 
+				is_approved: '',
+				admin_id: ''
+			},
+			errorMessage: [],
+			owners: []
 		};
 
 		this.onChange = this.onChange.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 	}
 
-	componentDidMount(){
-		const url = "/api/v1/users/index?role=admin";
-		fetch(url)
-			.then(response => {
-				if (response.ok) {
-					return response.json();
-				}
-				throw new Error("Network response was not ok")
+	componentDidMount() {	
+		const {
+			match: {
+				params: { id }
+			}
+		} = this.props;
+
+		const url = `/api/v1/properties/show/${id}`;
+		const url1 = "/api/v1/users/index?role=admin";
+
+		Promise.all([fetch(url), fetch(url1)])
+			.then(([res1, res2]) => { 
+				return Promise.all([res1.json(), res2.json()]) 
 			})
-			.then(response => { 
+			.then(([res1, res2]) => {
+				// set state in here
 				this.setState({
-					owners: response,
-					admin_id: response[0].id
+					property: res1,
+					owners: res2,
+		 			admin_id: res2[0].id
 				})
 			})
-			.catch(() => this.props.history.push("/"))
+			.catch(() => this.props.history.push("/properties"));
 	}
 
 	onChange(event) {
-		this.setState({ [event.target.name]: event.target.value });
+		var property = {...this.state.property};
+		property[event.target.name] = event.target.value;
+		this.setState({property});
 	}
 
 	selectCountry(val){
-		this.setState({ country: val });
+		var property = {...this.state.property};
+		property.country = val;
+		this.setState({ property });
 	}
 
 	selectState(val){
-		this.setState({ state: val });	
+		var property = {...this.state.property};
+		property.state = val;
+		this.setState({ state });	
 	}
 
-	onSubmit(event) {
+	onSubmit() {
 		event.preventDefault();
-		const url = "/api/v1/properties/create";
-		const { name, address, city, state, zipcode, country, is_approved, admin_id } = this.state;
+		const url = "/api/v1/properties/update/"+this.state.property.id;
+		const { name, address, city, state, zipcode, country, is_approved, admin_id } = this.state.property;
 
 		const body = {
 			name,
@@ -70,7 +84,7 @@ class NewUser extends React.Component {
 
 		const token = document.querySelector('meta[name="csrf-token"]').content;
 		fetch(url, {
-			method: "Post",
+			method: "Put",
 			headers: {
 				"X-CSRF-Token": token,
         		"Content-Type": "application/json"
@@ -96,9 +110,9 @@ class NewUser extends React.Component {
 	}
 
 	render(){
-		const { name, address, city, state, zipcode, country, is_approved, owners } = this.state;
-		const allOwners = owners.map((owner, index) => (
-			<option key={index} value={owner.id}>{`${owner.first_name} ${owner.last_name}`}</option>
+		const { property } = this.state;
+		const allOwners = this.state.owners.map((owner, index) => (
+				<option key={index} value={owner.id}>{`${owner.first_name} ${owner.last_name}`}</option>
 		));
 		const approval_status = [{name: "Approved", value: true}, {name: "Rejected", value: false}];
 		const approvals_list = approval_status.map((approval, index) => (
@@ -117,7 +131,7 @@ class NewUser extends React.Component {
 					}
 				  	<div className="col-sm-12 col-lg-6 offset-lg-3">
 					    <h1 className="font-weight-normal mb-5">
-					      Add a new property
+					      Edit Property
 					    </h1>
 					    <form onSubmit={this.onSubmit}>
 					      <div className="form-group">
@@ -129,6 +143,7 @@ class NewUser extends React.Component {
 					          className="form-control"
 					          required
 					          onChange={this.onChange}
+					          defaultValue={property.name}
 					        />
 					      </div>
 					      <div className="form-group">
@@ -140,6 +155,7 @@ class NewUser extends React.Component {
 					          className="form-control"
 					          required
 					          onChange={this.onChange}
+					          defaultValue={property.address}
 					        />
 					      </div>
 					      <div className="form-group">
@@ -151,6 +167,7 @@ class NewUser extends React.Component {
 					          className="form-control"
 					          required
 					          onChange={this.onChange}
+					          defaultValue={property.city}
 					        />
 					      </div>
 					      <div className="form-group">
@@ -162,13 +179,14 @@ class NewUser extends React.Component {
 					          className="form-control"
 					          required
 					          onChange={this.onChange}
+					          defaultValue={property.zipcode}
 					        />
 					      </div>
 					      <div className="form-group">
 					        <label htmlFor="state">State *</label>
 					        <RegionDropdown
-						        country={country}
-						        value={state}
+						        country={property.country}
+						        value={property.state}
 						        onChange={(val) => this.selectState(val)}
 						        className="form-control"
 						    />
@@ -177,7 +195,7 @@ class NewUser extends React.Component {
 					        <label htmlFor="country">Country *</label>
 					        <CountryDropdown 
 					        	name="country"
-					        	value={country}
+					        	value={property.country}
 					        	onChange={(val) => this.selectCountry(val)} 
 					        	className="form-control" 
 					        />
@@ -188,7 +206,8 @@ class NewUser extends React.Component {
 					        	name="is_approved"
 					        	id="is_approved"
 					        	className="form-control" 
-					        	onChange={this.onChange}>
+					        	onChange={this.onChange}
+					        	value={property.is_approved}>
 					        	{approvals_list}
 					        </select>
 					      </div>
@@ -198,12 +217,13 @@ class NewUser extends React.Component {
 					        	name="admin_id"
 					        	id="admin_id"
 					        	className="form-control" 
-					        	onChange={this.onChange}>
+					        	onChange={this.onChange}
+					        	value={property.admin_id}>
 					        	{allOwners}
 					        </select>
 					      </div>
 					      <button type="submit" className="btn custom-button mt-3">
-					        Create Property
+					        Update Property
 					      </button>
 					      <Link to="/properties" className="btn btn-link mt-3">
 					        Back to properties
@@ -216,4 +236,4 @@ class NewUser extends React.Component {
 	}
 }
 
-export default NewUser;
+export default Property;
