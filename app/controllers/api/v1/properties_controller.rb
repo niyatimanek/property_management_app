@@ -6,7 +6,6 @@ class Api::V1::PropertiesController < ApplicationController
 
   def create
     property = Property.new(property_params)
-    binding.pry
     if property.save
       render json: property
     else

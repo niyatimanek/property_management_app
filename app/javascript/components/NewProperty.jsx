@@ -30,7 +30,12 @@ class NewUser extends React.Component {
 				}
 				throw new Error("Network response was not ok")
 			})
-			.then(response => this.setState({ owners: response} ))
+			.then(response => { 
+				this.setState({
+					owners: response,
+					admin_id: response[0].id
+				})
+			})
 			.catch(() => this.props.history.push("/"))
 	}
 
@@ -50,9 +55,6 @@ class NewUser extends React.Component {
 		event.preventDefault();
 		const url = "/api/v1/properties/create";
 		const { name, address, city, state, zipcode, country, admin_id } = this.state;
-		debugger
-		// if( first_name.length == 0 || last_name.lenght == 0 || password.length == 0 )
-		// 	return;
 
 		const body = {
 			name,
@@ -86,7 +88,7 @@ class NewUser extends React.Component {
 		})
 		.then(response => this.props.history.push(`/properties`))
       	.catch(error => {
-      		// this.setState({ errorMessage: Object.entries(error.errors).map(([key,value],i) => `${key} ${value}` ) });
+      		this.setState({ errorMessage: Object.entries(error.errors).map(([key,value],i) => `${key} ${value}` ) });
       		console.log('There was an error!', error)
       	});
 	}
@@ -94,7 +96,7 @@ class NewUser extends React.Component {
 	render(){
 		const { name, address, city, state, zipcode, country, owners } = this.state;
 		const allOwners = owners.map((owner, index) => (
-				<option key={index} value={owner.id} defaultValue={ ( index == owners.length - 1 ) ? true : false}>{`${owner.first_name} ${owner.last_name}`}</option>
+				<option key={index} value={owner.id}>{`${owner.first_name} ${owner.last_name}`}</option>
 		));
 
 		return(
