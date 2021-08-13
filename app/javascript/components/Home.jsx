@@ -1,23 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Login from "../components/Login";
+import Header from "../components/Header";
 
 export default () => (
-  <div className="vw-100 vh-100 primary-color d-flex align-items-center justify-content-center">
-    <div className="jumbotron jumbotron-fluid bg-transparent">
-      <div className="container secondary-color">
-        <h1 className="display-4">Property Management App</h1>
-        <p className="lead">
-          Manage and list handpicked properties
-        </p>
-        <hr className="my-4" />
-        <Link
-          to="/superAdminDashboard"
-          className="btn btn-lg custom-button"
-          role="button"
-        >
-          Go to Super Admin Dashboard
-        </Link>
-      </div>
-    </div>
-  </div>
+  <>
+    <Header />
+    <Login />
+  </>  
 );
