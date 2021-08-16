@@ -11,5 +11,6 @@ User.create(
 	last_name: 'Manek',
 	password: 'temp123',
 	role: 'super_admin',
-	is_active: true
+	is_active: true,
+	username: 'niyatimanek'
 )

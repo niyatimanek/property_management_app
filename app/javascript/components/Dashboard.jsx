@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import ListProperties from "../components/ListProperties";
 
 class Dashboard extends React.Component {
 	constructor(props) {
@@ -28,17 +29,30 @@ class Dashboard extends React.Component {
 
 	render(){
 		const userParams = this.state.user;
-		return(
-			<div className="container">
-				<Header loggedIn={this.state.isLoggedIn} user={this.state.user}/>
-				<h3>{`Welcome, ${userParams.first_name} ${userParams.last_name}`}</h3>
-				<Link
+		const superAdminDashboardBtn = <Link
 			        to="/superAdminDashboard"
-		            className="btn btn-lg custom-button"
+		            className="btn btn-md custom-button"
 		         	role="button"
 			    >
 		        	Go to Super Admin Dashboard
 		       	</Link>
+		const adminDashboardBtn = <Link
+			        to="/adminDashboard"
+		            className="btn btn-md custom-button"
+		         	role="button"
+			    >
+		        	Go to Admin Dashboard
+		       	</Link>
+		return(
+			<div className="container">
+				<Header loggedIn={this.state.isLoggedIn} user={this.state.user}/>
+				<h3>{`Welcome, ${userParams.first_name} ${userParams.last_name}`}</h3>
+				<div className="padding-xs">
+					{ userParams.role == "super_admin" ? superAdminDashboardBtn : ''}
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					{ ( userParams.role == "super_admin" || userParams.role == "admin" ) ? adminDashboardBtn : ''}
+				</div>
+				<ListProperties />
 			</div>
 		);
 	}

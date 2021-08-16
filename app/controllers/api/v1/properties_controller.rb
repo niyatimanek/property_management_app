@@ -1,7 +1,11 @@
 class Api::V1::PropertiesController < ApplicationController
   def index
     # properties = Property.all.order(created_at: :desc)
-    properties = properties = Property.all.order(created_at: :desc).includes(:user).as_json(include: { user: { only: [:first_name, :last_name] } })
+    if params.key?(:is_approved) && params[:is_approved] == "true"
+      properties = Property.where(is_approved: true).order(created_at: :desc).includes(:user).as_json(include: { user: { only: [:first_name, :last_name] } })
+    else
+      properties = Property.all.order(created_at: :desc).includes(:user).as_json(include: { user: { only: [:first_name, :last_name] } })
+    end
     render json: properties
   end
 
@@ -36,6 +40,11 @@ class Api::V1::PropertiesController < ApplicationController
   def deactivate
     property.update_columns(is_active: false)
     render json: {message: 'Property Deactivated'}
+  end
+
+  def buy
+    property.update_columns(user_id: current_user.id)
+    render json: {message: 'Property sold successfully'}
   end
 
   private

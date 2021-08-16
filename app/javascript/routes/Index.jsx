@@ -13,6 +13,7 @@ import Properties from "../components/Properties";
 import NewProperty from "../components/NewProperty";
 import Property from "../components/Property";
 import Login from "../components/Login";
+import MyProperties from "../components/MyProperties";
 
 export default (
   <Router>
@@ -30,6 +31,7 @@ export default (
       <Route path="/newProperty" exact component={NewProperty} />
       <Route path="/property/:id" exact component={Property} />
       <Route path="/login" exact component={Login} />
+      <Route path="/myProperties" exact component={MyProperties} />
     </Switch>
   </Router>
 );

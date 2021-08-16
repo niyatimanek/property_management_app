@@ -23,6 +23,7 @@ class NewUser extends React.Component {
 	}
 
 	componentDidMount(){
+		debugger
 		const url = "/api/v1/users/index?role=admin";
 		fetch(url)
 			.then(response => {
@@ -37,7 +38,7 @@ class NewUser extends React.Component {
 					admin_id: response[0].id
 				})
 			})
-			.catch(() => this.props.history.push("/"))
+			.catch(() => this.props.history.push("/dashboard"))
 	}
 
 	onChange(event) {

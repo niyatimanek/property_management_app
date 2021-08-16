@@ -9,7 +9,7 @@ class Header extends React.Component {
       isLoggedIn: props.loggedIn,
       user: props.user
     }
-    this.handleClick = this.handleClick.bind(this);
+    this.handleClickLogout = this.handleClickLogout.bind(this);
   }
 
   static getDerivedStateFromProps(props, state){
@@ -29,7 +29,7 @@ class Header extends React.Component {
     })
   }
 
-  handleClick(){
+  handleClickLogout(){
     const url = '/logout';
     const token = document.querySelector('meta[name="csrf-token"]').content;
     fetch(url, {
@@ -57,7 +57,17 @@ class Header extends React.Component {
     const isLoggedIn = this.state.isLoggedIn;
     let logoutBtn = ''
     if(isLoggedIn){
-      logoutBtn = <div className="d-flex flex-row-reverse"><button onClick={this.handleClick} className="btn btn-lg custom-button " role="button">Logout</button></div>
+      logoutBtn = <div className="d-flex flex-row-reverse">
+                    <button onClick={this.handleClickLogout} className="btn btn-sm custom-button " role="button">Logout</button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Link
+                      to="/myProperties"
+                      className="btn btn-sm custom-button"
+                      role="button"
+                    >
+                      My Properties
+                    </Link>
+                  </div>
     }
     return(
       <div className="container">
@@ -66,7 +76,7 @@ class Header extends React.Component {
             <div className="container secondary-color">
               <h1 className="display-4">Property Management App</h1>
               <p className="lead text-center">
-                Manage and list handpicked properties
+                View, Buy and Manage handpicked properties
               </p>
               <hr className="my-4" />
             </div>
